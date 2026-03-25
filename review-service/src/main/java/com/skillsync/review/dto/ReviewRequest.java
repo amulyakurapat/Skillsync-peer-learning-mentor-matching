@@ -2,7 +2,8 @@ package com.skillsync.review.dto;
 
 public class ReviewRequest {
 
-    private Long mentorId;
+    private Long mentorId;       
+    private String mentorName;   
     private Long learnerId;
     private Long sessionId;
     private Integer rating;
@@ -10,6 +11,9 @@ public class ReviewRequest {
 
     public Long getMentorId() { return mentorId; }
     public void setMentorId(Long mentorId) { this.mentorId = mentorId; }
+
+    public String getMentorName() { return mentorName; }   
+    public void setMentorName(String mentorName) { this.mentorName = mentorName; }  
 
     public Long getLearnerId() { return learnerId; }
     public void setLearnerId(Long learnerId) { this.learnerId = learnerId; }

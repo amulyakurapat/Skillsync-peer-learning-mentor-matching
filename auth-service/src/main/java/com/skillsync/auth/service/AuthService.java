@@ -15,6 +15,8 @@ import com.skillsync.auth.repository.RoleRepository;
 import com.skillsync.auth.repository.UserRepository;
 import com.skillsync.auth.security.JwtUtil;
 import com.skillsync.auth.dto.RefreshTokenResponse;
+import com.skillsync.auth.client.UserClient;
+import com.skillsync.auth.dto.UserDto;
 @Service
 public class AuthService {
 
@@ -26,6 +28,8 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private UserClient userClient;
 
     // ✅ EXISTING — register
     public User registerUser(String name, String email, String password, String roleName) {
@@ -54,7 +58,18 @@ public class AuthService {
         Role role = roleRepository.findByName(finalRoleEnum)
                 .orElseThrow(() -> new RoleNotFoundException(finalRoleEnum.name()));
         user.getRoles().add(role);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+     // create DTO for User Service
+     UserDto dto = new UserDto();
+     dto.setId(savedUser.getId());
+     dto.setName(savedUser.getName());
+     dto.setEmail(savedUser.getEmail());
+
+     // call User Service
+     userClient.createUser(dto);
+
+     return savedUser;
     }
 
     // ✅ EXISTING — login

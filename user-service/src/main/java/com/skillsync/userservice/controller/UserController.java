@@ -1,6 +1,7 @@
 package com.skillsync.userservice.controller;
 
 import com.skillsync.userservice.dto.UserRequest;
+
 import com.skillsync.userservice.dto.UserResponse;
 import com.skillsync.userservice.service.UserService;
 import jakarta.validation.Valid;
@@ -9,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
+import com.skillsync.userservice.dto.UserDto;
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -36,6 +37,10 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
+    @GetMapping("/search")
+    public ResponseEntity<UserResponse> getUserByName(@RequestParam String name) {
+        return ResponseEntity.ok(userService.getUserByName(name));
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
@@ -47,5 +52,10 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("User deleted successfully");
+    }
+    @PostMapping("/internal")
+    public ResponseEntity<UserResponse> createUserFromAuth(@RequestBody UserDto dto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.createUserFromAuth(dto));
     }
 }

@@ -1,6 +1,7 @@
 package com.skillsync.userservice.service;
 
 import com.skillsync.userservice.dto.UserRequest;
+
 import com.skillsync.userservice.dto.UserResponse;
 import com.skillsync.userservice.entity.UserProfile;
 import com.skillsync.userservice.exception.UserAlreadyExistsException;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.skillsync.userservice.dto.UserDto;
 
 @Service
 public class UserService {
@@ -41,6 +43,18 @@ public class UserService {
         UserProfile user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(0L));
         return mapToResponse(user);
+    }
+    public UserResponse getUserByName(String name) {
+        UserProfile user = userRepository.findByName(name)
+            .orElseThrow(() -> new RuntimeException("User not found with name: " + name));
+        return mapToResponse(user);
+    }
+    public UserResponse createUserFromAuth(UserDto dto) {
+        UserProfile user = new UserProfile();
+        user.setId(dto.getId());       
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        return mapToResponse(userRepository.save(user));
     }
 
     public List<UserResponse> getAllUsers() {

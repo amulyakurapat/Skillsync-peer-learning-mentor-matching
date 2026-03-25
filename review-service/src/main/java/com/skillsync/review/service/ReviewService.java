@@ -1,11 +1,12 @@
 package com.skillsync.review.service;
 
+import com.skillsync.review.client.MentorClient;
+import com.skillsync.review.dto.MentorDTO;
 import com.skillsync.review.dto.ReviewRequest;
 import com.skillsync.review.dto.ReviewResponse;
 import com.skillsync.review.entity.Review;
 import com.skillsync.review.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,31 +14,43 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final MentorClient mentorClient;
 
-    public ReviewService(ReviewRepository reviewRepository) {
+    public ReviewService(ReviewRepository reviewRepository, MentorClient mentorClient) {
         this.reviewRepository = reviewRepository;
+        this.mentorClient = mentorClient;
     }
 
-    // Submit a review
     public ReviewResponse submitReview(ReviewRequest request) {
 
-        // Check duplicate review
+        // ✅ If mentorName provided, auto-resolve mentorId
+        if (request.getMentorName() != null && !request.getMentorName().isEmpty()) {
+            MentorDTO mentor = mentorClient.getMentorByName(request.getMentorName());
+            if (mentor == null) {
+                throw new RuntimeException("Mentor not found with name: " + request.getMentorName());
+            }
+            request.setMentorId(mentor.getId());
+        } else {
+            // fallback: verify mentorId directly
+            MentorDTO mentor = mentorClient.getMentorById(request.getMentorId());
+            if (mentor == null) {
+                throw new RuntimeException("Mentor not found with id: " + request.getMentorId());
+            }
+        }
+
         boolean exists = reviewRepository.existsByLearnerIdAndMentorIdAndSessionId(
                 request.getLearnerId(),
                 request.getMentorId(),
                 request.getSessionId()
         );
-
         if (exists) {
             throw new RuntimeException("You have already reviewed this session!");
         }
 
-        // Validate rating range
         if (request.getRating() < 1 || request.getRating() > 5) {
             throw new RuntimeException("Rating must be between 1 and 5!");
         }
 
-        // Save review
         Review review = new Review();
         review.setMentorId(request.getMentorId());
         review.setLearnerId(request.getLearnerId());
@@ -49,7 +62,6 @@ public class ReviewService {
         return mapToResponse(saved);
     }
 
-    // Get all reviews for a mentor
     public List<ReviewResponse> getReviewsByMentor(Long mentorId) {
         return reviewRepository.findByMentorId(mentorId)
                 .stream()
@@ -57,13 +69,11 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    // Get average rating for a mentor
     public Double getAverageRating(Long mentorId) {
         Double avg = reviewRepository.findAverageRatingByMentorId(mentorId);
         return avg != null ? avg : 0.0;
     }
 
-    // Get all reviews by a learner
     public List<ReviewResponse> getReviewsByLearner(Long learnerId) {
         return reviewRepository.findByLearnerId(learnerId)
                 .stream()
@@ -71,7 +81,6 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    // Delete a review
     public void deleteReview(Long id) {
         if (!reviewRepository.existsById(id)) {
             throw new RuntimeException("Review not found with id: " + id);
@@ -79,7 +88,6 @@ public class ReviewService {
         reviewRepository.deleteById(id);
     }
 
-    // Map entity to response DTO
     private ReviewResponse mapToResponse(Review review) {
         ReviewResponse response = new ReviewResponse();
         response.setId(review.getId());
