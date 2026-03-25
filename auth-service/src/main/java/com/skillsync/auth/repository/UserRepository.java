@@ -7,5 +7,6 @@ import com.skillsync.auth.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
+    boolean existsByEmail(String email); 
 
 }
