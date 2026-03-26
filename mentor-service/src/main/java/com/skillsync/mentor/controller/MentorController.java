@@ -1,6 +1,7 @@
 package com.skillsync.mentor.controller;
 
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.skillsync.mentor.dto.MentorDTO;
 import com.skillsync.mentor.dto.UserDTO;
@@ -49,5 +50,11 @@ public class MentorController {
     @GetMapping("/search")
     public Mentor getMentorByName(@RequestParam String name) {
         return mentorService.getMentorByName(name);
+    }
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Mentor> updateMentorStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
+        return ResponseEntity.ok(mentorService.updateMentorStatus(id, status));
     }
 }

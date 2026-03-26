@@ -3,10 +3,11 @@ package com.skillsync.mentor.dto;
 public class MentorDTO {
     private Long id;
     private Long userId;
-    private String name;        // ✅ NEW - from User Service
+    private String name;
     private String bio;
     private String skills;
     private String availability;
+    private String status;  // ✅ ADDED
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -20,4 +21,6 @@ public class MentorDTO {
     public void setSkills(String skills) { this.skills = skills; }
     public String getAvailability() { return availability; }
     public void setAvailability(String availability) { this.availability = availability; }
+    public String getStatus() { return status; }  // ✅ ADDED
+    public void setStatus(String status) { this.status = status; }  // ✅ ADDED
 }

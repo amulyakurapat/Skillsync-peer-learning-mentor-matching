@@ -29,6 +29,10 @@ public class SkillController {
     public ResponseEntity<List<SkillResponse>> getAllSkills() {
         return ResponseEntity.ok(skillService.getAllSkills());
     }
+    @GetMapping("/search")
+    public ResponseEntity<SkillResponse> getSkillByName(@RequestParam String name) {
+        return ResponseEntity.ok(skillService.getSkillByName(name));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<SkillResponse> getSkillById(@PathVariable Long id) {

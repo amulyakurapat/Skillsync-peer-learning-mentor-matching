@@ -69,6 +69,11 @@ public class SkillService {
         }
         skillRepository.deleteById(id);
     }
+    public SkillResponse getSkillByName(String name) {
+        Skill skill = skillRepository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Skill not found: " + name));
+        return mapToResponse(skill);
+    }
 
     private SkillResponse mapToResponse(Skill skill) {
         return new SkillResponse(

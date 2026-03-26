@@ -14,6 +14,7 @@ import com.skillsync.auth.entity.User;
 import com.skillsync.auth.security.JwtUtil;
 import com.skillsync.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
@@ -23,7 +24,6 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
-
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -54,32 +54,30 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
+    @Operation(summary = "Validate JWT token")
     public ResponseEntity<ValidateResponse> validate(
+            @Parameter(hidden = true)  // ✅ ADDED
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
         if (authHeader == null || authHeader.isBlank()) {
             return ResponseEntity.ok(new ValidateResponse(false, null, null, null));
         }
-
         String token = authHeader.startsWith("Bearer ")
                 ? authHeader.substring(7).trim()
                 : authHeader.trim();
-
         return ResponseEntity.ok(authService.validateToken(token));
     }
 
     @GetMapping("/me")
+    @Operation(summary = "Get current logged in user profile")
     public ResponseEntity<UserProfileResponse> getMe(
+            @Parameter(hidden = true)  // ✅ ADDED
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
         if (authHeader == null || authHeader.isBlank()) {
             throw new RuntimeException("Authorization header missing");
         }
-
         String token = authHeader.startsWith("Bearer ")
                 ? authHeader.substring(7).trim()
                 : authHeader.trim();
-
         return ResponseEntity.ok(authService.getMe(token));
     }
 
@@ -93,6 +91,7 @@ public class AuthController {
     @PostMapping("/logout")
     @Operation(summary = "Logout and invalidate token")
     public ResponseEntity<String> logout(
+            @Parameter(hidden = true)  // ✅ ADDED
             @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         return ResponseEntity.ok(authService.logout(token));

@@ -1,11 +1,13 @@
 package com.skillsync.session.dto;
 
 public class MentorDTO {
+
     private Long id;
     private Long userId;
     private String bio;
     private String skills;
     private String availability;
+    private String status;  // ✅ NEW
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -17,4 +19,6 @@ public class MentorDTO {
     public void setSkills(String skills) { this.skills = skills; }
     public String getAvailability() { return availability; }
     public void setAvailability(String availability) { this.availability = availability; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

@@ -24,5 +24,17 @@ public class SkillRequest {
 	public String getDescription() {
 		return description;
 	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
     
 }

@@ -1,18 +1,23 @@
 package com.skillsync.mentor.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class Mentor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long id;  // ✅ annotations belong here
 
     private Long userId;
     private String bio;
     private String skills;
     private String availability;
+
+    @Enumerated(EnumType.STRING)
+    private MentorStatus status;  // ✅ only @Enumerated here
 
     public Mentor() {}
 
@@ -54,5 +59,13 @@ public class Mentor {
 
     public void setAvailability(String availability) {
         this.availability = availability;
+    }
+
+    public MentorStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(MentorStatus status) {
+        this.status = status;
     }
 }

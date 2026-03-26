@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import com.skillsync.notification.client.UserClient;
+import com.skillsync.notification.dto.UserDTO;
 import com.skillsync.notification.event.SessionBookedEvent;
 
 @Service
@@ -12,6 +14,9 @@ public class NotificationConsumer {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private UserClient userClient;
 
     @RabbitListener(queues = "session.queue")
     public void handleSessionBooked(SessionBookedEvent event) {
@@ -24,17 +29,19 @@ public class NotificationConsumer {
         System.out.println("Status      : " + event.getStatus());
         System.out.println("===========================================");
 
-        // ✅ Send email to learner
         sendEmailToLearner(event);
     }
 
     private void sendEmailToLearner(SessionBookedEvent event) {
         try {
+            UserDTO learner = userClient.getUserById(event.getLearnerId());
+            String learnerEmail = learner.getEmail();
+
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo("learner_email@gmail.com"); // ← we'll make this dynamic next
+            message.setTo(learnerEmail);
             message.setSubject("✅ Session Confirmed - SkillSync");
             message.setText(
-                "Hello!\n\n" +
+                "Hello " + learner.getName() + "!\n\n" +
                 "Your session has been successfully booked on SkillSync.\n\n" +
                 "📋 Session Details:\n" +
                 "  Session ID  : " + event.getSessionId() + "\n" +
@@ -44,10 +51,8 @@ public class NotificationConsumer {
                 "Thank you for using SkillSync!\n" +
                 "The SkillSync Team"
             );
-
             mailSender.send(message);
-            System.out.println("✅ Email sent successfully!");
-
+            System.out.println("✅ Email sent to: " + learnerEmail);
         } catch (Exception e) {
             System.out.println("❌ Email sending failed: " + e.getMessage());
         }
