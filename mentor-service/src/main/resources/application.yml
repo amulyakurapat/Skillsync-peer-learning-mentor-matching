@@ -1,5 +1,65 @@
+server:
+  port: 8083
+
 spring:
   application:
     name: mentor-service
-  config:
-    import: configserver:http://localhost:8888
+
+  cloud:
+    config:
+      enabled: false
+
+  datasource:
+    url: jdbc:mysql://host.docker.internal:3306/skillsync_mentor
+    username: root
+    password: Shally@183
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+  endpoint:
+    health:
+      show-details: always
+
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+  api-docs:
+    path: /v3/api-docs
+
+  servers:
+    - url: http://api-gateway:8080/mentors
+      description: Via API Gateway
+    - url: http://mentor-service:8083
+      description: Direct

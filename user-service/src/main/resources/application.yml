@@ -1,5 +1,56 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: user-service
-  config:
-    import: configserver:http://localhost:8888
+
+  datasource:
+    url: jdbc:mysql://host.docker.internal:3306/skillsync_user
+    username: root
+    password: Shally@183
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+  endpoint:
+    health:
+      show-details: always
+
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+  api-docs:
+    path: /v3/api-docs
+
+  servers:
+    - url: http://api-gateway:8080/users
+      description: Via API Gateway
+    - url: http://user-service:8082
+      description: Direct

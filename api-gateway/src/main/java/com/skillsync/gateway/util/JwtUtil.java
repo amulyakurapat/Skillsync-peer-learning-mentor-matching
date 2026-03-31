@@ -22,7 +22,10 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
-            extractAllClaims(token);
+            Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
@@ -30,16 +33,25 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
-        return extractAllClaims(token).getSubject();
+        return extractClaims(token).getSubject();
     }
 
     public String extractRole(String token) {
-        Claims claims = extractAllClaims(token);
-        Object role = claims.get("role");
-        return role != null ? role.toString() : null;
+        return (String) extractClaims(token).get("role");
     }
 
-    private Claims extractAllClaims(String token) {
+    public Long extractUserId(String token) {
+        Object value = extractClaims(token).get("userId");
+        if (value == null) return null;
+        if (value instanceof Number n) return n.longValue();
+        try {
+            return Long.parseLong(value.toString());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Claims extractClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()

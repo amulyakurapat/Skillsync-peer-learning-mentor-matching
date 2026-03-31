@@ -1,0 +1,7 @@
+CREATE DATABASE IF NOT EXISTS skillsync_auth;
+CREATE DATABASE IF NOT EXISTS skillsync_user;
+CREATE DATABASE IF NOT EXISTS skillsync_mentor;
+CREATE DATABASE IF NOT EXISTS skillsync_skill;
+CREATE DATABASE IF NOT EXISTS skillsync_session;
+CREATE DATABASE IF NOT EXISTS skillsync_review;
+CREATE DATABASE IF NOT EXISTS skillsync_notification;

@@ -18,9 +18,22 @@ public class SecurityConfig {
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/register", "/auth/login",
-                        "/auth/refresh", "/auth/validate",
-                        "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers(
+                    "/auth/register",
+                    "/auth/login",
+                    "/auth/refresh",
+                    "/auth/validate",
+                    "/auth/me",
+                    "/me",
+                    "/auth/logout",
+                    "/actuator/**",
+                    "/v3/api-docs/**",
+                    "/v3/api-docs",
+                    "/swagger-ui/**",
+                    "/swagger-ui/index.html",
+                    "/swagger-ui.html",
+                    "/webjars/**"
+                ).permitAll()
                 .anyRequest().authenticated()
             );
         return http.build();

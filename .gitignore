@@ -1,2 +1,11 @@
-/.metadata/
-.env
+docker-compose.yml
+**/application.yml
+**/JwtUtil.java
+target/
+*.log
+.idea/
+*.iml
+.metadata/
+.project
+.classpath
+.settings/

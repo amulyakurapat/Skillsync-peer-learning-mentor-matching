@@ -1,5 +1,40 @@
+server:
+  port: 8088
+
 spring:
   application:
     name: notification-service
-  config:
-    import: optional:configserver:http://localhost:8888
+
+  datasource:
+    url: jdbc:mysql://host.docker.internal:3306/skillsync_notification
+    username: root
+    password: Shally@183
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      zipkin:
+        endpoint: http://zipkin:9411/api/v2/spans

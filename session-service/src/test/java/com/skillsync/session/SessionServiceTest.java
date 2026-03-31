@@ -1,6 +1,8 @@
 package com.skillsync.session;
 
+import com.skillsync.session.client.MentorClient;
 import com.skillsync.session.config.RabbitMQConfig;
+import com.skillsync.session.dto.MentorDTO;
 import com.skillsync.session.entity.Session;
 import com.skillsync.session.event.SessionBookedEvent;
 import com.skillsync.session.repository.SessionRepository;
@@ -11,14 +13,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class SessionServiceTest {
 
     @Mock
@@ -27,10 +31,14 @@ public class SessionServiceTest {
     @Mock
     private RabbitTemplate rabbitTemplate;
 
+    @Mock
+    private MentorClient mentorClient;
+
     @InjectMocks
     private SessionService sessionService;
 
     private Session mockSession;
+    private MentorDTO mockMentor;
 
     @BeforeEach
     void setUp() {
@@ -40,12 +48,19 @@ public class SessionServiceTest {
         mockSession.setLearnerId(22L);
         mockSession.setSessionTime("2026-03-26 10:00 AM");
         mockSession.setStatus("REQUESTED");
+
+        mockMentor = new MentorDTO();
+        mockMentor.setId(1L);
+        mockMentor.setStatus("APPROVED");
     }
 
     // ===================== CREATE SESSION TESTS =====================
 
     @Test
     void createSession_Success() {
+        when(mentorClient.getMentorById(1L)).thenReturn(mockMentor);
+        when(sessionRepository.existsByMentorIdAndLearnerIdAndSessionTime(anyLong(), anyLong(), anyString()))
+                .thenReturn(false);
         when(sessionRepository.save(any(Session.class))).thenReturn(mockSession);
         doNothing().when(rabbitTemplate).convertAndSend(
                 anyString(), anyString(), any(SessionBookedEvent.class)
@@ -68,6 +83,9 @@ public class SessionServiceTest {
         session.setSessionTime("2026-03-26 10:00 AM");
         // status NOT set intentionally
 
+        when(mentorClient.getMentorById(1L)).thenReturn(mockMentor);
+        when(sessionRepository.existsByMentorIdAndLearnerIdAndSessionTime(anyLong(), anyLong(), anyString()))
+                .thenReturn(false);
         when(sessionRepository.save(any(Session.class))).thenReturn(mockSession);
         doNothing().when(rabbitTemplate).convertAndSend(
                 anyString(), anyString(), any(SessionBookedEvent.class)
@@ -81,6 +99,9 @@ public class SessionServiceTest {
 
     @Test
     void createSession_SavesSessionToDatabase() {
+        when(mentorClient.getMentorById(1L)).thenReturn(mockMentor);
+        when(sessionRepository.existsByMentorIdAndLearnerIdAndSessionTime(anyLong(), anyLong(), anyString()))
+                .thenReturn(false);
         when(sessionRepository.save(any(Session.class))).thenReturn(mockSession);
         doNothing().when(rabbitTemplate).convertAndSend(
                 anyString(), anyString(), any(SessionBookedEvent.class)
@@ -93,6 +114,9 @@ public class SessionServiceTest {
 
     @Test
     void createSession_PublishesEventToRabbitMQ() {
+        when(mentorClient.getMentorById(1L)).thenReturn(mockMentor);
+        when(sessionRepository.existsByMentorIdAndLearnerIdAndSessionTime(anyLong(), anyLong(), anyString()))
+                .thenReturn(false);
         when(sessionRepository.save(any(Session.class))).thenReturn(mockSession);
         doNothing().when(rabbitTemplate).convertAndSend(
                 anyString(), anyString(), any(SessionBookedEvent.class)
@@ -109,6 +133,9 @@ public class SessionServiceTest {
 
     @Test
     void createSession_ThrowsException_WhenSaveFails() {
+        when(mentorClient.getMentorById(1L)).thenReturn(mockMentor);
+        when(sessionRepository.existsByMentorIdAndLearnerIdAndSessionTime(anyLong(), anyLong(), anyString()))
+                .thenReturn(false);
         when(sessionRepository.save(any(Session.class)))
                 .thenThrow(new RuntimeException("Database error"));
 
@@ -122,6 +149,9 @@ public class SessionServiceTest {
 
     @Test
     void createSession_ThrowsException_WhenRabbitMQFails() {
+        when(mentorClient.getMentorById(1L)).thenReturn(mockMentor);
+        when(sessionRepository.existsByMentorIdAndLearnerIdAndSessionTime(anyLong(), anyLong(), anyString()))
+                .thenReturn(false);
         when(sessionRepository.save(any(Session.class))).thenReturn(mockSession);
         doThrow(new RuntimeException("RabbitMQ error"))
                 .when(rabbitTemplate).convertAndSend(
