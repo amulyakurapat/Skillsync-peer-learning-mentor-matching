@@ -1,2 +1,3 @@
-# Skillsync-peer-learning-mentor-matching
-SkillSync is a platform built using Spring Boot microservices architecture.
+# SkillSync – Peer Learning & Mentor Matching Platform
+
+SkillSync is a peer learning and mentor matching platform built using Spring Boot microservices architecture.
